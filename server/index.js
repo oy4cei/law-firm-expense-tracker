@@ -385,7 +385,7 @@ app.get('/api/export', authenticateToken, async (req, res) => {
 });
 
 // Serve React app for all non-API routes (must be after API routes)
-app.get('*', (req, res) => {
+app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
