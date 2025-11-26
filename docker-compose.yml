@@ -1,0 +1,32 @@
+services:
+  server:
+    build: ./server
+    container_name: law-firm-server
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/database.sqlite:/app/database.sqlite
+    restart: always
+
+  client-build:
+    build: ./client
+    container_name: law-firm-client-build
+    volumes:
+      - client_dist:/output
+    command: sh -c "cp -r /app/dist/* /output/"
+
+  nginx:
+    image: nginx:alpine
+    container_name: law-firm-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - client_dist:/usr/share/nginx/html
+    depends_on:
+      - server
+      - client-build
+    restart: always
+
+volumes:
+  client_dist:

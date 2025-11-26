@@ -1,0 +1,23 @@
+{
+  "name": "law-firm-expense-tracker",
+  "version": "1.0.0",
+  "description": "Law Firm Expense Tracker - Full Stack Application",
+  "scripts": {
+    "install:client": "cd client && npm install",
+    "install:server": "cd server && npm install",
+    "install:all": "npm run install:client && npm run install:server",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm start",
+    "railway:build": "npm run install:all && npm run build:client",
+    "railway:start": "npm run start"
+  },
+  "keywords": ["expense-tracker", "law-firm", "react", "express"],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
