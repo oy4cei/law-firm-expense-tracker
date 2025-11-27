@@ -27,7 +27,7 @@ git commit -m "Initial commit - Law Firm Expense Tracker"
 ### 1.3 Push to GitHub
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/law-firm-expense-tracker.git
+git remote add origin https://github.com/oy4cei/law-firm-expense-tracker.git
 git branch -M main
 git push -u origin main
 ```
@@ -78,6 +78,23 @@ Railway will automatically:
 3. Start the Express server
 4. Assign a public URL
 
+### 2.5 Custom Domain Setup (Optional)
+
+If you have purchased a domain (e.g., `mylawfirm.com`):
+
+1. Go to your Railway project dashboard.
+2. Click on your service.
+3. Go to the **Settings** tab.
+4. Scroll down to **Networking** → **Custom Domains**.
+5. Click **+ Custom Domain** and enter your domain (e.g., `mylawfirm.com`).
+6. Railway will show you DNS records to configure.
+7. Go to your domain registrar (where you bought the domain) and add the records:
+   - **Type:** `CNAME` (or `A` record as instructed)
+   - **Name:** `@` (or `www`)
+   - **Value:** The value provided by Railway (e.g., `law-firm.up.railway.app`)
+
+*Note: DNS propagation can take up to 24-48 hours, but usually happens within minutes.*
+
 ---
 
 ## Step 3: Initialize Database
@@ -97,18 +114,15 @@ After first deployment, you need to seed the database with the admin user.
    railway link
    ```
 
-3. Run seed script:
+3. Run seed script (Safe Mode - only if empty):
    ```bash
    railway run node server/seed.js
    ```
 
-### Option B: Manual via Railway Shell
-
-1. In Railway dashboard, go to your service
-2. Click on **"Settings"** → **"Deploy"** → **"Custom Start Command"**
-3. Temporarily change to: `node server/seed.js && node server/index.js`
-4. Wait for deployment to complete
-5. Change back to: `npm run railway:start`
+4. **WARNING:** To wipe and re-seed the database (Destructive):
+   ```bash
+   railway run node server/seed.js --force
+   ```
 
 ---
 

@@ -4,8 +4,25 @@ const bcrypt = require('bcryptjs');
 
 const seed = async () => {
     try {
-        await sequelize.sync({ force: true }); // WARNING: This clears the DB
-        console.log('Database cleared and synced.');
+        const args = process.argv.slice(2);
+        const force = args.includes('--force');
+
+        if (force) {
+            console.log('Force flag detected. Wiping database...');
+            await sequelize.sync({ force: true }); // WARNING: This clears the DB
+            console.log('Database cleared and synced.');
+        } else {
+            console.log('No --force flag. syncing without wipe...');
+            await sequelize.sync(); // Safe sync
+
+            // Check if admin exists to avoid duplicate seeding or errors
+            const admin = await User.findOne({ where: { username: 'admin' } });
+            if (admin) {
+                console.log('Admin user already exists. Seeding skipped to prevent data loss.');
+                console.log('To wipe and re-seed, run: node server/seed.js --force');
+                process.exit(0);
+            }
+        }
 
         // Create admin user
         const hashedPassword = await bcrypt.hash('admin123', 10);
