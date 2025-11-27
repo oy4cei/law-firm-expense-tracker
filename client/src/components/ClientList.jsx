@@ -49,7 +49,9 @@ export default function ClientList() {
         setNewClient({ name: client.name, email: client.email, phone: client.phone });
     };
 
-    const handleDelete = async (id) => {
+    const [deleteConfirmation, setDeleteConfirmation] = useState({ isOpen: false, clientId: null, message: '' });
+
+    const handleDeleteClick = async (id) => {
         try {
             const impactRes = await axios.get(`/api/clients/${id}/impact`);
             const { cases, expenses, incomes } = impactRes.data;
@@ -58,11 +60,18 @@ export default function ClientList() {
             if (cases > 0 || expenses > 0 || incomes > 0) {
                 message += `\n\nУВАГА: Це також видалить:\n- ${cases} справ\n- ${expenses} витрат\n- ${incomes} доходів`;
             }
+            setDeleteConfirmation({ isOpen: true, clientId: id, message });
+        } catch (error) {
+            console.error('Error checking impact:', error);
+            alert('Не вдалося перевірити дані клієнта');
+        }
+    };
 
-            if (window.confirm(message)) {
-                await axios.delete(`/api/clients/${id}`);
-                fetchClients();
-            }
+    const confirmDelete = async () => {
+        try {
+            await axios.delete(`/api/clients/${deleteConfirmation.clientId}`);
+            setDeleteConfirmation({ isOpen: false, clientId: null, message: '' });
+            fetchClients();
         } catch (error) {
             console.error('Error deleting client:', error);
             alert('Не вдалося видалити клієнта');
@@ -73,6 +82,36 @@ export default function ClientList() {
 
     return (
         <div className="space-y-6">
+            {/* Delete Confirmation Modal */}
+            {deleteConfirmation.isOpen && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+                    <div className="relative p-5 border w-96 shadow-lg rounded-md bg-white">
+                        <div className="mt-3 text-center">
+                            <h3 className="text-lg leading-6 font-medium text-gray-900">Підтвердження видалення</h3>
+                            <div className="mt-2 px-7 py-3">
+                                <p className="text-sm text-gray-500 whitespace-pre-line">
+                                    {deleteConfirmation.message}
+                                </p>
+                            </div>
+                            <div className="items-center px-4 py-3">
+                                <button
+                                    onClick={confirmDelete}
+                                    className="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 mb-2"
+                                >
+                                    Видалити
+                                </button>
+                                <button
+                                    onClick={() => setDeleteConfirmation({ isOpen: false, clientId: null, message: '' })}
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                                >
+                                    Скасувати
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="bg-white shadow rounded-lg p-6">
                 <h2 className="text-xl font-bold mb-4 text-gray-900">Додати нового клієнта</h2>
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -150,7 +189,7 @@ export default function ClientList() {
                                             Редагувати
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(client.id)}
+                                            onClick={() => handleDeleteClick(client.id)}
                                             className="text-red-600 hover:text-red-900"
                                         >
                                             Видалити
