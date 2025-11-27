@@ -101,28 +101,33 @@ If you have purchased a domain (e.g., `mylawfirm.com`):
 
 After first deployment, you need to seed the database with the admin user.
 
-### Option A: Using Railway CLI
+### Option A: Automatic Seeding via Start Command (Recommended)
 
-1. Install Railway CLI:
+Since we are using SQLite (a file-based database), you cannot seed it remotely from your computer. Instead, we configure Railway to run the seed script automatically when the app starts.
+
+1. In Railway dashboard, go to your service.
+2. Click on **"Settings"** → **"Deploy"**.
+3. Change **"Start Command"** to:
    ```bash
-   npm i -g @railway/cli
+   node server/seed.js && npm run railway:start
    ```
 
-2. Login and link project:
-   ```bash
-   railway login
-   railway link
-   ```
+**Why is this safe?**
+We modified `server/seed.js` to be "safe". It checks if the admin user already exists.
+- **First run:** It creates the admin user and default data.
+- **Subsequent runs:** It sees the admin user exists and does nothing (skips seeding).
 
-3. Run seed script (Safe Mode - only if empty):
-   ```bash
-   railway run node server/seed.js
-   ```
+### Option B: Resetting the Database (Destructive)
 
-4. **WARNING:** To wipe and re-seed the database (Destructive):
-   ```bash
-   railway run node server/seed.js --force
-   ```
+If you need to **wipe** the database and start over:
+
+1. Go to **"Variables"** in Railway.
+2. Add a variable `FORCE_DB_RESET=true` (or similar, but our script uses a flag).
+3. Actually, the easiest way is to use the **Railway Shell**:
+   - Go to your service dashboard.
+   - Click on the **"Shell"** tab (if available) or use the "Command Palette" (Cmd+K) -> "Shell".
+   - Run: `node server/seed.js --force`
+   - Restart the service.
 
 ---
 
