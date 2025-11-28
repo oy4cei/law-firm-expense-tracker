@@ -399,3 +399,15 @@ sequelize.sync().then(() => {
 }).catch(err => {
     console.error('Unable to connect to the database:', err);
 });
+
+// Global Error Handling to prevent crashes
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT EXCEPTION:', err);
+    // Keep the process alive or exit gracefully depending on severity
+    // For debugging, we want to see the log
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('UNHANDLED REJECTION:', reason);
+});
+
