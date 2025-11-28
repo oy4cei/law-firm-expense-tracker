@@ -167,6 +167,63 @@ app.post('/api/cases', authenticateToken, async (req, res) => {
 
 // ... (skip put/delete for brevity if not changing) ...
 
+// Expenses
+app.get('/api/expenses', authenticateToken, async (req, res) => {
+    console.log('GET /api/expenses request received');
+    try {
+        // Simplified query to prevent crashes from bad associations
+        const expenses = await Expense.findAll({
+            include: {
+                model: Case,
+                attributes: ['title'] // Only fetch title, no nested Client for now
+            }
+        });
+        console.log(`Found ${expenses.length} expenses`);
+        res.json(expenses);
+    } catch (err) {
+        console.error('Error in GET /api/expenses:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/expenses', authenticateToken, async (req, res) => {
+    try {
+        const expense = await Expense.create(req.body);
+        res.status(201).json(expense);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+app.put('/api/expenses/:id', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [updated] = await Expense.update(req.body, { where: { id } });
+        if (updated) {
+            const updatedExpense = await Expense.findOne({ where: { id }, include: Case });
+            res.status(200).json(updatedExpense);
+        } else {
+            res.status(404).json({ error: 'Expense not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/expenses/:id', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = await Expense.destroy({ where: { id } });
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ error: 'Expense not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Incomes
 app.get('/api/incomes', authenticateToken, async (req, res) => {
     console.log('GET /api/incomes request received');
