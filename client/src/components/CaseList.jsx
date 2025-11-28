@@ -66,18 +66,31 @@ export default function CaseList() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Submitting case:', newCase);
         try {
+            const caseData = {
+                ...newCase,
+                clientId: newCase.clientId === '' ? null : newCase.clientId
+            };
+            console.log('Payload:', caseData);
+
             if (editingCase) {
-                await axios.put(`/api/cases/${editingCase.id}`, newCase);
+                await axios.put(`/api/cases/${editingCase.id}`, caseData);
                 setEditingCase(null);
             } else {
-                await axios.post('/api/cases', newCase);
+                await axios.post('/api/cases', caseData);
             }
             setNewCase({ title: '', description: '', status: 'Open', clientId: '' });
-            fetchData();
+            console.log('Case saved, fetching data...');
+            await fetchData();
         } catch (error) {
             console.error('Error saving case:', error);
-            alert('Не вдалося зберегти справу');
+            if (error.response) {
+                console.error('Server response:', error.response.data);
+                alert(`Помилка сервера: ${error.response.data.error || 'Невідома помилка'}`);
+            } else {
+                alert('Не вдалося зберегти справу');
+            }
         }
     };
 
