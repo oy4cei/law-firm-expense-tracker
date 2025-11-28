@@ -59,7 +59,62 @@ export default function IncomeList() {
                     Додати дохід
                 </Link>
             </div>
+
+            <div className="bg-white p-4 rounded-lg shadow space-y-4 sm:space-y-0 sm:flex sm:space-x-4">
+                <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700">Клієнт</label>
+                    <input
+                        type="text"
+                        value={filterClient}
+                        onChange={(e) => setFilterClient(e.target.value)}
+                        placeholder="Пошук по клієнту"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">З дати</label>
+                    <input
+                        type="date"
+                        value={filterStartDate}
+                        onChange={(e) => setFilterStartDate(e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">По дату</label>
+                    <input
+                        type="date"
+                        value={filterEndDate}
+                        onChange={(e) => setFilterEndDate(e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                    />
+                </div>
+            </div>
+
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Опис</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Клієнт</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Сума</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Джерело</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {filteredIncomes.map((income) => (
+                            <tr key={income.id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{income.date}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{income.description}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {income.Case && income.Case.Client ? income.Case.Client.name : '-'}
                                 </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {formatCurrency(income.amount)} {income.currency}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{income.source}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <Link
                                         to={`/incomes/${income.id}/edit`}
@@ -74,12 +129,11 @@ export default function IncomeList() {
                                         Видалити
                                     </button>
                                 </td>
-                            </tr >
-                        ))
-}
-                    </tbody >
-                </table >
-            </div >
-        </div >
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     );
 }
