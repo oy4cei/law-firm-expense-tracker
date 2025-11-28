@@ -38,12 +38,22 @@ export default function AddIncome() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Submitting income:', formData);
         try {
-            await axios.post('/api/incomes', formData);
-            navigate('/report');
+            const payload = {
+                ...formData,
+                caseId: formData.caseId === '' ? null : formData.caseId
+            };
+            await axios.post('/api/incomes', payload);
+            navigate('/report'); // Redirect to report or incomes list
         } catch (error) {
             console.error('Error creating income:', error);
-            alert('Не вдалося додати дохід');
+            if (error.response) {
+                console.error('Server response:', error.response.data);
+                alert(`Помилка сервера: ${error.response.data.error || 'Невідома помилка'}`);
+            } else {
+                alert('Не вдалося додати дохід');
+            }
         }
     };
 

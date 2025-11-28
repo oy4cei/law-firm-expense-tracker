@@ -40,12 +40,22 @@ export default function AddExpense() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Submitting expense:', formData);
         try {
-            await axios.post('/api/expenses', formData);
+            const payload = {
+                ...formData,
+                caseId: formData.caseId === '' ? null : formData.caseId
+            };
+            await axios.post('/api/expenses', payload);
             navigate('/expenses');
         } catch (error) {
             console.error('Error creating expense:', error);
-            alert('Не вдалося створити витрату');
+            if (error.response) {
+                console.error('Server response:', error.response.data);
+                alert(`Помилка сервера: ${error.response.data.error || 'Невідома помилка'}`);
+            } else {
+                alert('Не вдалося створити витрату');
+            }
         }
     };
 

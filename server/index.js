@@ -171,10 +171,11 @@ app.post('/api/cases', authenticateToken, async (req, res) => {
 app.get('/api/incomes', authenticateToken, async (req, res) => {
     console.log('GET /api/incomes request received');
     try {
+        // Simplified query to prevent crashes from bad associations
         const incomes = await Income.findAll({
             include: {
                 model: Case,
-                include: [Client]
+                attributes: ['title'] // Only fetch title, no nested Client for now
             }
         });
         console.log(`Found ${incomes.length} incomes`);
@@ -188,6 +189,11 @@ app.get('/api/incomes', authenticateToken, async (req, res) => {
 app.post('/api/incomes', authenticateToken, async (req, res) => {
     console.log('POST /api/incomes request received', req.body);
     try {
+        const { description, amount, caseId } = req.body;
+        if (!description || !amount) {
+            return res.status(400).json({ error: 'Description and amount are required' });
+        }
+
         const income = await Income.create(req.body);
         console.log('Income created:', income.id);
         res.status(201).json(income);

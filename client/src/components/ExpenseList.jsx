@@ -30,7 +30,11 @@ export default function ExpenseList() {
             ));
         } catch (error) {
             console.error('Error updating status:', error);
-            alert('Не вдалося оновити статус');
+            if (error.response) {
+                alert(`Помилка сервера: ${error.response.data.error || 'Невідома помилка'}`);
+            } else {
+                alert('Не вдалося оновити статус');
+            }
         }
     };
 
@@ -41,7 +45,11 @@ export default function ExpenseList() {
                 fetchExpenses();
             } catch (error) {
                 console.error('Error deleting expense:', error);
-                alert('Не вдалося видалити витрату');
+                if (error.response) {
+                    alert(`Помилка сервера: ${error.response.data.error || 'Невідома помилка'}`);
+                } else {
+                    alert('Не вдалося видалити витрату');
+                }
             }
         }
     };

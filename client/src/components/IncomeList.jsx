@@ -29,7 +29,11 @@ export default function IncomeList() {
                 fetchIncomes();
             } catch (error) {
                 console.error('Error deleting income:', error);
-                alert('Не вдалося видалити дохід');
+                if (error.response) {
+                    alert(`Помилка сервера: ${error.response.data.error || 'Невідома помилка'}`);
+                } else {
+                    alert('Не вдалося видалити дохід');
+                }
             }
         }
     };
