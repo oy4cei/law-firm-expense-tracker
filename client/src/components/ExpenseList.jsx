@@ -6,6 +6,9 @@ import { formatCurrency } from '../utils/format';
 export default function ExpenseList() {
     const [expenses, setExpenses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [filterClient, setFilterClient] = useState('');
+    const [filterStartDate, setFilterStartDate] = useState('');
+    const [filterEndDate, setFilterEndDate] = useState('');
 
     useEffect(() => {
         fetchExpenses();
@@ -62,15 +65,57 @@ export default function ExpenseList() {
         'Paid': 'Оплачено'
     };
 
+    const filteredExpenses = expenses.filter(expense => {
+        const matchesClient = filterClient === '' ||
+            (expense.Case && expense.Case.Client && expense.Case.Client.name.toLowerCase().includes(filterClient.toLowerCase()));
+        const matchesStartDate = filterStartDate === '' || new Date(expense.date) >= new Date(filterStartDate);
+        const matchesEndDate = filterEndDate === '' || new Date(expense.date) <= new Date(filterEndDate);
+        return matchesClient && matchesStartDate && matchesEndDate;
+    });
+
+    if (loading) return <div className="p-4">Завантаження...</div>;
+
     return (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">Звіт про витрати</h3>
-                <Link to="/expenses/new" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-900">Витрати</h2>
+                <Link to="/expenses/new" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                     Додати витрату
                 </Link>
             </div>
-            <div className="border-t border-gray-200 overflow-x-auto">
+
+            <div className="bg-white p-4 rounded-lg shadow space-y-4 sm:space-y-0 sm:flex sm:space-x-4">
+                <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700">Клієнт</label>
+                    <input
+                        type="text"
+                        value={filterClient}
+                        onChange={(e) => setFilterClient(e.target.value)}
+                        placeholder="Пошук по клієнту"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">З дати</label>
+                    <input
+                        type="date"
+                        value={filterStartDate}
+                        onChange={(e) => setFilterStartDate(e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">По дату</label>
+                    <input
+                        type="date"
+                        value={filterEndDate}
+                        onChange={(e) => setFilterEndDate(e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                    />
+                </div>
+            </div>
+
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -85,7 +130,7 @@ export default function ExpenseList() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {expenses.map((expense) => (
+                        {filteredExpenses.map((expense) => (
                             <tr key={expense.id}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{expense.date}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{expense.description}</td>
