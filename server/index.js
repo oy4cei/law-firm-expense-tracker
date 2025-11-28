@@ -175,7 +175,11 @@ app.get('/api/expenses', authenticateToken, async (req, res) => {
         const expenses = await Expense.findAll({
             include: {
                 model: Case,
-                attributes: ['title'] // Only fetch title, no nested Client for now
+                attributes: ['title'],
+                include: {
+                    model: Client,
+                    attributes: ['id', 'name']
+                }
             }
         });
         console.log(`Found ${expenses.length} expenses`);
@@ -232,7 +236,11 @@ app.get('/api/incomes', authenticateToken, async (req, res) => {
         const incomes = await Income.findAll({
             include: {
                 model: Case,
-                attributes: ['title'] // Only fetch title, no nested Client for now
+                attributes: ['title'],
+                include: {
+                    model: Client,
+                    attributes: ['id', 'name']
+                }
             }
         });
         console.log(`Found ${incomes.length} incomes`);
