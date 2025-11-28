@@ -76,9 +76,6 @@ Modern expense tracking application for law firms built with React, Express, and
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:3001
 
-6. **Login**
-   - Username: `admin`
-   - Password: `admin123`
 
 ## Deployment
 
